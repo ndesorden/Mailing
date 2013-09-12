@@ -1,0 +1,55 @@
+﻿using System;
+using Microsoft.Office.Interop.Excel;
+using System.Reflection;
+
+
+namespace AtmMailing
+{
+    class MyExcel
+    {
+        private Application ExcelObj;
+        private Workbook theWorkbook;
+        private Sheets sheets;
+        Worksheet worksheet;
+
+        private string file;
+
+        public MyExcel(string file)
+        {
+            ExcelObj = new Application();
+            if (ExcelObj == null)
+            {
+                throw new Exception("Error al iniciar Excel!!");
+            }
+            this.file = file;
+            theWorkbook = ExcelObj.Workbooks.Open(file,
+                Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+            sheets = theWorkbook.Worksheets;
+            worksheet = (Worksheet)theWorkbook.ActiveSheet;
+        }
+
+        public void setWorkSheet(int index)
+        {
+            this.worksheet = (Worksheet)sheets.get_Item(index);
+        }
+
+        public object readExcelColumn(string columName)
+        {
+            object[,] valueArray = null;
+            string columna = String.Format("{0}:{0}", columName);
+
+            if (worksheet != null)
+            {
+                Range range = worksheet.get_Range(columna, Missing.Value);
+                if (range != null)
+                {
+                    valueArray = (object[,])range.get_Value(XlRangeValueDataType.xlRangeValueDefault);
+                }
+            }
+
+            return valueArray;
+        }
+
+    }
+}
